@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.uberv.buildvariants.MainActivity">
+
+    <TextView
+        android:id="@+id/app_id_tv"
+        android:layout_width="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="application id: com.example.uberv.buildvariants"/>
+
+    <TextView
+        android:id="@+id/build_type_tv"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="@+id/app_id_tv"
+        app:layout_constraintStart_toStartOf="@+id/app_id_tv"
+        app:layout_constraintTop_toBottomOf="@+id/app_id_tv"
+        tools:text="build type: debug"/>
+
+    <TextView
+        android:id="@+id/flavor_tv"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        tools:text="flavor: paid"
+        app:layout_constraintEnd_toEndOf="@+id/build_type_tv"
+        app:layout_constraintStart_toStartOf="@+id/build_type_tv"
+        app:layout_constraintTop_toBottomOf="@+id/build_type_tv"/>
+
+    <TextView
+        android:id="@+id/version_code_tv"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        tools:text="version code: 10001"
+        app:layout_constraintEnd_toEndOf="@+id/flavor_tv"
+        app:layout_constraintStart_toStartOf="@+id/flavor_tv"
+        app:layout_constraintTop_toBottomOf="@+id/flavor_tv"/>
+
+    <TextView
+        android:id="@+id/version_name_tv"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        tools:text="version name: 1.0-minApi21-customer"
+        app:layout_constraintEnd_toEndOf="@+id/version_code_tv"
+        app:layout_constraintStart_toStartOf="@+id/version_code_tv"
+        app:layout_constraintTop_toBottomOf="@+id/version_code_tv"/>
+
+</android.support.constraint.ConstraintLayout>

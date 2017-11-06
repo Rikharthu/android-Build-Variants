@@ -1,0 +1,160 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 26
+    defaultConfig {
+        applicationId "com.example.uberv.buildvariants"
+        minSdkVersion 21
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        // Changing application id allows to create different application on release and debug build
+        // (different application id == different application)
+
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
+        // debug build type is created automatically by android studio and is configured as
+        // debuggable = true. Redeclare it to add/change some properties
+        debug {
+            // add suffix '.debug' to the application id (by default there is no suffix)
+            applicationIdSuffix ".debug"
+            // before   com.example.uberv.buildvariants
+            // after    com.example.uberv.buildvariants.debug
+
+            debuggable true
+        }
+        /*
+        Other configurable build type properties include:
+        signingOptions
+        debuggable
+        useJack
+        versionNameSuffix
+        and more http://google.github.io/android-gradle-dsl/current/com.android.build.gradle.internal.dsl.BuildType.html
+         */
+
+        // Create a 'staging' build type
+        /**
+         * The `initWith` property allows you to copy configurations from other build types,
+         * then configure just the settings you want to change. This one copies the debug build
+         * type, and then changes the manifest placeholder and application ID.
+         */
+        staging {
+            initWith debug
+            // manifest placeholders can be used in the manifest like ${hostName}
+            manifestPlaceholders = [hostName: "internal.example.com"]
+            applicationIdSuffix ".debugStaging"
+        }
+    }
+
+    // Flavors
+    // more info http://google.github.io/android-gradle-dsl/current/com.android.build.gradle.internal.dsl.ProductFlavor.html
+    // since gradle 3.0 all flavors must belong to a named flavor dimension
+    // order determines priority, from hight to lowest
+    flavorDimensions "api", "tier"
+
+    productFlavors {
+        admin {
+            // sources under src/admin
+
+            // since gradle 3.0 all flavors must belong to a named flavor dimension
+            dimension 'tier'
+            versionNameSuffix "-admin"
+        }
+        customer {
+            // src/customer
+
+            dimension 'tier'
+            versionNameSuffix "-customer"
+        }
+
+        // Configurations in the "api" product flavors override those in "tier"
+        // flavors and the defaultConfig block. Gradle determines the priority
+        // between flavor dimensions based on the order in which they appear next
+        // to the flavorDimensions property above--the first dimension has a higher
+        // priority than the second, and so on.
+        minApi24 {
+            dimension "api"
+            minSdkVersion 24
+            // To ensure the target device receives the version of the app with
+            // the highest compatible API level, assign version codes in increasing
+            // value with API level. To learn more about assigning version codes to
+            // support app updates and uploading to Google Play, read Multiple APK Support
+            versionCode 30000 + android.defaultConfig.versionCode
+            versionNameSuffix "-minApi24"
+        }
+
+        minApi23 {
+            dimension "api"
+            minSdkVersion 23
+            versionCode 20000 + android.defaultConfig.versionCode
+            versionNameSuffix "-minApi23"
+        }
+
+        minApi21 {
+            dimension "api"
+            minSdkVersion 21
+            versionCode 10000 + android.defaultConfig.versionCode
+            versionNameSuffix "-minApi21"
+        }
+    }
+    /*
+    Build variant: [minApi24, minApi23, minApi21][customer, admin][Debug, Release, Staging]
+    Corresponding APK: app-[minApi24, minApi23, minApi21]-[customer, admin]-[debug, release, staging].apk
+    app-minApi23-customer-release.apk, app-minApi21-admin-debug.apk and etc...
+    */
+
+    // Gradle creates a build variant for every possible combination of product flavors and build types.
+    // To remove certain combinations use 'variantFilter' block
+    variantFilter { variant ->
+        def names = variant.flavors*.name
+        // To check for a certain build type, use variant.buildType.name == "<buildType>"
+        if (names.contains("minApi21") && names.contains("admin")) {
+            // In this example all 'admin' devices will be 21+ sdk
+
+            // Gradle ignores any variants that satisfy the conditions above.
+            setIgnore(true)
+        }
+    }
+
+    // finally run 'gradle sourceSets' task to see available sourceSets
+
+    /*
+    you can create source set directories for product flavors, such as src/demo/,
+    and build variants, such as src/demoDebug/. Additionally, you can create testing source sets
+    that target specific build variants, such as src/androidTestDemoDebug/
+
+    For example, if you are building the "demoDebug" build variant, which is the crossproduct of a
+    "demo" product flavor and "debug" build type, Gradle looks at these directories, and gives them
+    the following priority:
+        src/demoDebug/ (build variant source set)
+        src/debug/ (build type source set)
+        src/demo/ (product flavor source set)
+        src/main/ (main source set)
+    */
+
+    /*
+    When you configure product flavors, the Android plugin automatically combines them with your BuildType
+    configurations to create build variants. If the plugin creates certain build variants that you
+    don't want, you can filter variants using android.variantFilter.
+     */
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    implementation 'com.jakewharton:butterknife:8.8.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+
+    // dependency only for 'customer' flavor
+    customerImplementation 'com.squareup.retrofit2:retrofit:2.3.0'
+}
